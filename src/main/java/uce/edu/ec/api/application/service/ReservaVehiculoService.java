@@ -36,6 +36,19 @@ public class ReservaVehiculoService {
 
     public void crearReservaVehiculo(ReservaVehiculo reserva) {
 
+        if (reserva == null) {
+            throw new WebApplicationException("El cuerpo de la petición no puede estar vacío", 400);
+        }
+        if (reserva.getUsuario() == null || reserva.getUsuario().getCedula() == null) {
+            throw new WebApplicationException("La cédula del usuario es obligatoria", 400);
+        }
+        if (reserva.getVendedor() == null || reserva.getVendedor().getCedulaVendedor() == null) {
+            throw new WebApplicationException("La cédula del vendedor es obligatoria", 400);
+        }
+        if (reserva.getVehiculo() == null || reserva.getVehiculo().getPlaca() == null) {
+            throw new WebApplicationException("La placa del vehículo es obligatoria", 400);
+        }
+
         String cedula = reserva.getUsuario().getCedula();
         String cedulaVendedor = reserva.getVendedor().getCedulaVendedor();
         String placa = reserva.getVehiculo().getPlaca();
@@ -70,6 +83,11 @@ public class ReservaVehiculoService {
         if (dias <= 0) {
             dias = 1;
         }
+
+        if (vehiculo.getCategoriaVehiculo() == null || vehiculo.getCategoriaVehiculo().getPrecioPorDia() == null) {
+            throw new WebApplicationException("El vehículo no tiene asignado un precio por día válido", 400);
+        }
+
         BigDecimal total = vehiculo.getCategoriaVehiculo().getPrecioPorDia().multiply(BigDecimal.valueOf(dias));
 
         reserva.setUsuario(usuario);
@@ -84,7 +102,6 @@ public class ReservaVehiculoService {
         this.rri.persist(reserva);
 
         vehiculo.setEstadoDisponibilidad("RESERVADO");
-
     }
 
     public List<ReservaVehiculo> buscarTodos() {
@@ -92,6 +109,10 @@ public class ReservaVehiculoService {
     }
 
     public void actualizarReservaVehiculo(ReservaVehiculo reserva, Integer id) {
+
+        if (reserva == null) {
+            throw new WebApplicationException("Los datos para actualizar no pueden estar vacíos", 400);
+        }
 
         ReservaVehiculo base = this.buscarReservaVehiculoId(id);
 
@@ -113,6 +134,12 @@ public class ReservaVehiculoService {
         if (dias <= 0) {
             dias = 1;
         }
+
+        if (base.getVehiculo() == null || base.getVehiculo().getCategoriaVehiculo() == null
+                || base.getVehiculo().getCategoriaVehiculo().getPrecioPorDia() == null) {
+            throw new WebApplicationException("Error al calcular el total: Categoría de vehículo no encontrada", 400);
+        }
+
         BigDecimal total = base.getVehiculo().getCategoriaVehiculo().getPrecioPorDia()
                 .multiply(BigDecimal.valueOf(dias));
         base.setTotal(total);
@@ -120,19 +147,26 @@ public class ReservaVehiculoService {
         if ("CANCELADA".equalsIgnoreCase(base.getEstado()) || "FINALIZADA".equalsIgnoreCase(base.getEstado())) {
             base.getVehiculo().setEstadoDisponibilidad("DISPONIBLE");
         }
-
     }
 
     public ReservaVehiculo buscarReservaVehiculoId(Integer id) {
+        if (id == null) {
+            throw new WebApplicationException("El ID de la reserva es obligatorio", 400);
+        }
 
-        return ReservaVehiculo.findById(id);
+        ReservaVehiculo reserva = this.rri.findById(id);
+        if (reserva == null) {
+            throw new WebApplicationException("No existe una reserva registrada con el ID: " + id, 404);
+        }
+
+        return reserva;
     }
 
     public void eliminarReservaVehiculoId(Integer id) {
-
         ReservaVehiculo base = this.buscarReservaVehiculoId(id);
-        base.getVehiculo().setEstadoDisponibilidad("DISPONIBLE");
+        if (base.getVehiculo() != null) {
+            base.getVehiculo().setEstadoDisponibilidad("DISPONIBLE");
+        }
         this.rri.deleteById(id);
     }
-
 }
