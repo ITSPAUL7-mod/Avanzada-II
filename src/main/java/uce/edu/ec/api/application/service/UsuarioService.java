@@ -6,11 +6,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
+import uce.edu.ec.api.application.service.interceptor.Auditar;
 import uce.edu.ec.api.domain.model.Usuario;
 import uce.edu.ec.api.infraestructure.repository.UsuarioRepositoryImpl;
 
 @ApplicationScoped
 @Transactional
+@Auditar
 public class UsuarioService {
 
     @Inject

@@ -6,11 +6,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
+import uce.edu.ec.api.application.service.interceptor.Auditar;
 import uce.edu.ec.api.domain.model.Vendedor;
 import uce.edu.ec.api.infraestructure.repository.VendedorRepositoryImpl;
 
 @ApplicationScoped
 @Transactional
+@Auditar
 public class VendedorService {
 
     @Inject

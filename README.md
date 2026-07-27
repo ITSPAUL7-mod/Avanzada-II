@@ -45,6 +45,7 @@ La API queda disponible en `http://localhost:8080`.
 uce.edu.ec
  ├── domain.model              -> Entidades JPA (extienden PanacheEntityBase, id de tipo Integer con SequenceGenerator)
  ├── infraestructure.repository -> XxxxRepositoryImpl implementando PanacheRepositoryBase<Entidad, Integer>
+ ├── application.service.interceptor  -> Interceptores CDI y anotaciones de auditoría
  ├── application.service        -> XxxxService con la lógica de negocio y validaciones
  └── web.resource                -> XxxxResources con los endpoints JAX-RS
 ```
