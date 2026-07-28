@@ -3,10 +3,7 @@ package uce.edu.ec.api.domain.model;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Table(name = "vendedor")
@@ -14,11 +11,6 @@ import jakarta.persistence.Table;
 public class Vendedor extends PanacheEntityBase {
 
     @Id
-    @SequenceGenerator(name = "seq_vendedor_generador", sequenceName = "vendedor_generador", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_vendedor_generador")
-    @Column(name = "ven_id")
-    private Integer id;
-
     @Column(name = "ven_cedula_vendedor")
     private String cedulaVendedor;
 
@@ -28,15 +20,7 @@ public class Vendedor extends PanacheEntityBase {
     @Column(name = "ven_telefono")
     private String telefono;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getCedulaVendedor() {
+       public String getCedulaVendedor() {
         return cedulaVendedor;
     }
 
@@ -62,8 +46,7 @@ public class Vendedor extends PanacheEntityBase {
 
     @Override
     public String toString() {
-        return "Vendedor [id=" + id + ", cedulaVendedor=" + cedulaVendedor + ", nombre=" + nombre + ", telefono="
-                + telefono + "]";
+        return "Vendedor [cedulaVendedor=" + cedulaVendedor + ", nombre=" + nombre + ", telefono=" + telefono + "]";
     }
 
 }

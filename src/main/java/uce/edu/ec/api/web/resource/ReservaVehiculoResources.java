@@ -55,4 +55,25 @@ public class ReservaVehiculoResources {
     public void eliminar(@PathParam("id") Integer id) {
         this.rs.eliminarReservaVehiculoId(id);
     }
+
+    // http://localhost:8080/reservas/porCedulaUsuario/{cedula}
+    @Path("/porCedulaUsuario/{cedula}")
+    @GET
+    public ReservaVehiculo buscarPorCedulaUsuario(@PathParam("cedula") String cedula) {
+        return this.rs.buscarPorCedulaUsuario(cedula);
+    }
+
+    // http://localhost:8080/reservas/porCedulaVendedor/{cedulaVendedor}
+    @Path("/porCedulaVendedor/{cedulaVendedor}")
+    @GET
+    public ReservaVehiculo buscarPorCedulaVendedor(@PathParam("cedulaVendedor") String cedulaVendedor) {
+        return this.rs.buscarPorCedulaVendedor(cedulaVendedor);
+    }
+
+    // http://localhost:8080/reservas/porPlaca/{placa}
+    @Path("/porPlaca/{placa}")
+    @GET
+    public ReservaVehiculo buscarPorPlacaVehiculo(@PathParam("placa") String placa) {
+        return this.rs.buscarPorPlaca(placa);
+    }
 }

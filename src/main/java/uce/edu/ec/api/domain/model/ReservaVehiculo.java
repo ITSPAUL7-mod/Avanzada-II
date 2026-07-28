@@ -3,9 +3,14 @@ package uce.edu.ec.api.domain.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,21 +40,25 @@ public class ReservaVehiculo extends PanacheEntityBase {
     private LocalDate fechaFin;
 
     @Column(name = "res_estado")
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    private EstadoDisponibilidad estado;
 
     @Column(name = "res_total")
     private BigDecimal total;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "res_usuario_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "res_vendedor_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Vendedor vendedor;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "res_vehiculo_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Vehiculo vehiculo;
 
     public Integer getId() {
@@ -84,11 +93,11 @@ public class ReservaVehiculo extends PanacheEntityBase {
         this.fechaFin = fechaFin;
     }
 
-    public String getEstado() {
+    public EstadoDisponibilidad getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoDisponibilidad estado) {
         this.estado = estado;
     }
 

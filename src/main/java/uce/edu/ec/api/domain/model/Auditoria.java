@@ -1,5 +1,7 @@
 package uce.edu.ec.api.domain.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,15 +16,16 @@ public class Auditoria {
     @SequenceGenerator(name = "seq_auditoria_generador", sequenceName = "seq_auditoria", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_auditoria_generador")
     private Integer id;
-
-    @Column(name = "audi_selects")
-    private Integer selects;
-    @Column(name = "audi_inserts")
-    private Integer inserts;
-    @Column(name = "audi_updates")
-    private Integer updates;
-    @Column(name = "audi_deletes")
-    private Integer deletes;
+    @Column(name = "audi_entidad")
+    private String entidad;
+    @Column(name = "audi_operacion")
+    private String operacion;
+    @Column(name = "audi_fecha")
+     private LocalDateTime fecha;
+    @Column(name = "audi_metodo")
+    private String metodo;
+    @Column(name = "audi_descripcion")
+    private String descripcion;
     
     public Auditoria() {
     }
@@ -30,33 +33,51 @@ public class Auditoria {
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
-    public Integer getSelects() {
-        return selects;
+
+    public String getEntidad() {
+        return entidad;
     }
-    public void setSelects(Integer selects) {
-        this.selects = selects;
+
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
     }
-    public Integer getInserts() {
-        return inserts;
+
+    public String getOperacion() {
+        return operacion;
     }
-    public void setInserts(Integer inserts) {
-        this.inserts = inserts;
+
+    public void setOperacion(String operacion) {
+        this.operacion = operacion;
     }
-    public Integer getUpdates() {
-        return updates;
+
+    public LocalDateTime getFecha() {
+        return fecha;
     }
-    public void setUpdates(Integer updates) {
-        this.updates = updates;
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
     }
-    public Integer getDeletes() {
-        return deletes;
+
+    public String getMetodo() {
+        return metodo;
     }
-    public void setDeletes(Integer deletes) {
-        this.deletes = deletes;
+
+    public void setMetodo(String metodo) {
+        this.metodo = metodo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     
+
 }

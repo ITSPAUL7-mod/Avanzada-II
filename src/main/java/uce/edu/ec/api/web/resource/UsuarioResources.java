@@ -18,11 +18,11 @@ public class UsuarioResources {
     @Inject
     private UsuarioService us;
 
-    // http://localhost:8080/usuarios/porId/2
-    @Path("/porId/{id}")
+    // http://localhost:8080/usuarios/porCedula/1234567890
+    @Path("/porCedula/{cedula}")
     @GET
-    public Usuario buscarPorId(@PathParam("id") Integer id) {
-        return this.us.buscarUsuarioId(id);
+    public Usuario buscarPorCedula(@PathParam("cedula") String cedula) {
+        return this.us.buscarPorCedula(cedula);
     }
 
     // http://localhost:8080/usuarios/todos
@@ -40,18 +40,19 @@ public class UsuarioResources {
         return usuario;
     }
 
-    // http://localhost:8080/usuarios/actualizar/{id}
-    @Path("/actualizar/{id}")
+    // http://localhost:8080/usuarios/actualizar/{cedula}
+    @Path("/actualizar/{cedula}")
     @PUT
-    public String actualizar(Usuario usuarioNuevo, @PathParam("id") Integer id) {
-        this.us.actualizarUsuario(usuarioNuevo, id);
+    public String actualizar(Usuario usuarioNuevo, @PathParam("cedula") String cedula) {
+        this.us.actualizarUsuario(usuarioNuevo, cedula);
         return "Usuario actualizado correctamente";
     }
 
-    // http://localhost:8080/usuarios/eliminar/{id}
-    @Path("/eliminar/{id}")
+    // http://localhost:8080/usuarios/eliminar/{cedula}
+    @Path("/eliminar/{cedula}")
     @DELETE
-    public void eliminar(@PathParam("id") Integer id) {
-        this.us.eliminarUsuarioId(id);
+    public String eliminar(@PathParam("cedula") String cedula) {
+        this.us.eliminarPorCedula(cedula);
+        return "Usuario eliminado correctamente";
     }
 }

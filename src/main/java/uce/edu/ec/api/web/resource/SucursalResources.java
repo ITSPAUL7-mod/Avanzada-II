@@ -13,7 +13,6 @@ import uce.edu.ec.api.application.service.SucursalService;
 import uce.edu.ec.api.domain.model.Sucursal;
 
 @Path("/sucursales")
-
 public class SucursalResources {
 
     @Inject
@@ -52,7 +51,15 @@ public class SucursalResources {
     // http://localhost:8080/sucursales/eliminar/{id}
     @Path("/eliminar/{id}")
     @DELETE
-    public void eliminar(@PathParam("id") Integer id) {
+    public String eliminar(@PathParam("id") Integer id) {
         this.ss.eliminarSucursalId(id);
+        return "Sucursal eliminada correctamente";
+    }
+
+    // http://localhost:8080/sucursales/porId
+    @GET
+    @Path("/porId")
+    public Sucursal buscarSinId() {
+        return this.ss.buscarSucursalId(null);
     }
 }

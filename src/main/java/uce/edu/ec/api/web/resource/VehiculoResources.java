@@ -58,7 +58,16 @@ public class VehiculoResources {
     // http://localhost:8080/vehiculos/eliminar/{id}
     @Path("/eliminar/{id}")
     @DELETE
-    public void eliminar(@PathParam("id") Integer id) {
+    public String eliminar(@PathParam("id") Integer id) {
         this.vs.eliminarVehiculoId(id);
+        return "Vehículo eliminado correctamente";
+    }
+    // http://localhost:8080/vehiculos/porMarcayModelo/{marca}/{modelo}
+    @Path("/porMarcayModelo/{marca}/{modelo}")
+    @GET
+    public List<Vehiculo> buscarPorMarcaYModelo(@PathParam("marca") String marca, @PathParam("modelo") String modelo) {
+        System.out.println("ENTRO SIN ID");
+        return this.vs.buscarMarcayModelo(marca, modelo);
+
     }
 }

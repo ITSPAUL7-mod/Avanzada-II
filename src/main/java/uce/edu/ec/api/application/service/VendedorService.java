@@ -6,6 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import uce.edu.ec.api.application.service.interceptor.Auditar;
 import uce.edu.ec.api.domain.model.Vendedor;
 import uce.edu.ec.api.infraestructure.repository.VendedorRepositoryImpl;
@@ -21,24 +23,44 @@ public class VendedorService {
     public void crearVendedor(Vendedor vendedor) {
 
         if (vendedor == null) {
-            throw new WebApplicationException("El cuerpo de la petición no puede estar vacío", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("El cuerpo de la petición no puede estar vacío")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         if (vendedor.getCedulaVendedor() == null || vendedor.getCedulaVendedor().trim().isEmpty()) {
-            throw new WebApplicationException("La cédula del vendedor es obligatoria", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("La cédula del vendedor es obligatoria")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         if (vendedor.getNombre() == null || vendedor.getNombre().trim().isEmpty()) {
-            throw new WebApplicationException("El nombre del vendedor es obligatorio", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("El nombre del vendedor es obligatorio")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         if (vendedor.getTelefono() == null || vendedor.getTelefono().trim().isEmpty()) {
-            throw new WebApplicationException("El teléfono del vendedor es obligatorio", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("El teléfono del vendedor es obligatorio")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         Vendedor existeCedula = this.vri.find("cedulaVendedor", vendedor.getCedulaVendedor().trim()).firstResult();
         if (existeCedula != null) {
-            throw new WebApplicationException("Ya existe un vendedor registrado con la cédula: " + vendedor.getCedulaVendedor(), 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Ya existe un vendedor registrado con la cédula: " + vendedor.getCedulaVendedor())
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         this.vri.persist(vendedor);
@@ -48,19 +70,27 @@ public class VendedorService {
         return this.vri.findAll().list();
     }
 
-    public void actualizarVendedor(Vendedor vendedor, Integer id) {
+    public void actualizarVendedor(Vendedor vendedor, String cedula) {
 
         if (vendedor == null) {
-            throw new WebApplicationException("Los datos para actualizar no pueden estar vacíos", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Los datos para actualizar no pueden estar vacíos")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
-        Vendedor base = this.buscarVendedorId(id);
+        Vendedor base = this.buscarPorCedula(cedula);
 
         if (vendedor.getCedulaVendedor() != null && !vendedor.getCedulaVendedor().trim().isEmpty()) {
             if (!vendedor.getCedulaVendedor().equalsIgnoreCase(base.getCedulaVendedor())) {
                 Vendedor existeCedula = this.vri.find("cedulaVendedor", vendedor.getCedulaVendedor().trim()).firstResult();
                 if (existeCedula != null) {
-                    throw new WebApplicationException("La cédula " + vendedor.getCedulaVendedor() + " ya está asignada a otro vendedor", 400);
+                    throw new WebApplicationException(
+                            Response.status(Response.Status.BAD_REQUEST)
+                                    .entity("La cédula " + vendedor.getCedulaVendedor() + " ya está asignada a otro vendedor")
+                                    .type(MediaType.TEXT_PLAIN)
+                                    .build());
                 }
                 base.setCedulaVendedor(vendedor.getCedulaVendedor());
             }
@@ -75,24 +105,32 @@ public class VendedorService {
         }
     }
 
-    public Vendedor buscarVendedorId(Integer id) {
+   
 
-        if (id == null) {
-            throw new WebApplicationException("El ID del vendedor es obligatorio", 400);
+//-----------------------------------------------
+    public void eliminarPorCedula(String cedula) {
+        this.buscarPorCedula(cedula);
+        this.vri.delete("cedula", cedula); 
+    }
+
+    public Vendedor buscarPorCedula(String cedula) {
+        if (cedula == null || cedula.trim().isEmpty()) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("La cédula del vendedor es obligatoria")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
-        Vendedor vendedor = this.vri.findById(id); 
+        Vendedor vendedor = this.vri.find("cedulaVendedor", cedula.trim()).firstResult();
         if (vendedor == null) {
-            throw new WebApplicationException("No existe un vendedor registrado con el ID: " + id, 404);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.NOT_FOUND)
+                            .entity("No existe un vendedor registrado con la cédula: " + cedula)
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         return vendedor;
-    }
-
-    public void eliminarVendedorId(Integer id) {
-
-        this.buscarVendedorId(id);
-
-        this.vri.deleteById(id); 
     }
 }

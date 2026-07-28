@@ -3,26 +3,31 @@ package uce.edu.ec.api.web.resource;
 import java.util.List;
 
 import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import uce.edu.ec.api.application.service.VendedorService;
 import uce.edu.ec.api.domain.model.Vendedor;
 
 @Path("/vendedores")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class VendedorResources {
 
     @Inject
     private VendedorService vs;
 
-    // http://localhost:8080/vendedores/porId/2
-    @Path("/porId/{id}")
+    // http://localhost:8080/vendedores/porCedula/1234567890
+    @Path("/porCedula/{cedula}")
     @GET
-    public Vendedor buscarPorId(@PathParam("id") Integer id) {
-        return this.vs.buscarVendedorId(id);
+    public Vendedor buscarPorCedula(@PathParam("cedula") String cedula) {
+        return this.vs.buscarPorCedula(cedula);
     }
 
     // http://localhost:8080/vendedores/todos
@@ -40,18 +45,18 @@ public class VendedorResources {
         return vendedor;
     }
 
-    // http://localhost:8080/vendedores/actualizar/{id}
-    @Path("/actualizar/{id}")
+    // http://localhost:8080/vendedores/actualizar/{cedula}
+    @Path("/actualizar/{cedula}")
     @PUT
-    public String actualizar(Vendedor vendedorNuevo, @PathParam("id") Integer id) {
-        this.vs.actualizarVendedor(vendedorNuevo, id);
+    public String actualizar(Vendedor vendedorNuevo, @PathParam("cedula") String cedula) {
+        this.vs.actualizarVendedor(vendedorNuevo, cedula);
         return "Vendedor actualizado correctamente";
     }
 
-    // http://localhost:8080/vendedores/eliminar/{id}
-    @Path("/eliminar/{id}")
+    // http://localhost:8080/vendedores/eliminar/{cedula}
+    @Path("/eliminar/{cedula}")
     @DELETE
-    public void eliminar(@PathParam("id") Integer id) {
-        this.vs.eliminarVendedorId(id);
+    public void eliminarPorCedula(@PathParam("cedula") String cedula) {
+        this.vs.eliminarPorCedula(cedula);
     }
 }

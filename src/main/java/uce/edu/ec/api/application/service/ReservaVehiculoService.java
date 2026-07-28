@@ -8,7 +8,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import uce.edu.ec.api.application.service.interceptor.Auditar;
+import uce.edu.ec.api.domain.model.EstadoDisponibilidad;
 import uce.edu.ec.api.domain.model.ReservaVehiculo;
 import uce.edu.ec.api.domain.model.Usuario;
 import uce.edu.ec.api.domain.model.Vehiculo;
@@ -38,53 +41,89 @@ public class ReservaVehiculoService {
     public void crearReservaVehiculo(ReservaVehiculo reserva) {
 
         if (reserva == null) {
-            throw new WebApplicationException("El cuerpo de la petición no puede estar vacío", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("El cuerpo de la petición no puede estar vacío")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
         if (reserva.getUsuario() == null || reserva.getUsuario().getCedula() == null) {
-            throw new WebApplicationException("La cédula del usuario es obligatoria", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("La cédula del usuario es obligatoria")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
         if (reserva.getVendedor() == null || reserva.getVendedor().getCedulaVendedor() == null) {
-            throw new WebApplicationException("La cédula del vendedor es obligatoria", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("La cédula del vendedor es obligatoria")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
         if (reserva.getVehiculo() == null || reserva.getVehiculo().getPlaca() == null) {
-            throw new WebApplicationException("La placa del vehículo es obligatoria", 400);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("La placa del vehículo es obligatoria")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         Usuario usuario = this.uri.find("cedula", reserva.getUsuario().getCedula()).firstResult();
         if (usuario == null) {
-            throw new WebApplicationException("No existe un usuario registrado con la cédula " + reserva.getUsuario().getCedula(), 404);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.NOT_FOUND)
+                            .entity("No existe un usuario registrado con la cédula " + reserva.getUsuario().getCedula())
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         Vendedor vendedor = this.vri.find("cedulaVendedor", reserva.getVendedor().getCedulaVendedor()).firstResult();
         if (vendedor == null) {
-            throw new WebApplicationException("No existe un vendedor registrado con la cédula " + reserva.getVendedor().getCedulaVendedor(), 404);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.NOT_FOUND)
+                            .entity("No existe un vendedor registrado con la cédula " + reserva.getVendedor().getCedulaVendedor())
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         Vehiculo vehiculo = this.vhri.find("placa", reserva.getVehiculo().getPlaca()).firstResult();
         if (vehiculo == null) {
-            throw new WebApplicationException("No existe un vehículo registrado con la placa " + reserva.getVehiculo().getPlaca(), 404);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.NOT_FOUND)
+                            .entity("No existe un vehículo registrado con la placa " + reserva.getVehiculo().getPlaca())
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
-        if (!"DISPONIBLE".equalsIgnoreCase(vehiculo.getEstadoDisponibilidad())) {
-            throw new WebApplicationException("El vehículo con placa " + vehiculo.getPlaca() + " no está disponible", 400);
+        if (vehiculo.getEstadoDisponibilidad() != EstadoDisponibilidad.DISPONIBLE) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("El vehículo con placa " + vehiculo.getPlaca() + " no está disponible")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
-        if (reserva.getFechaInicio() == null || reserva.getFechaFin() == null || !reserva.getFechaFin().isAfter(reserva.getFechaInicio())) {
-            throw new WebApplicationException("La fechaFin debe ser posterior a la fechaInicio", 400);
+        if (reserva.getFechaInicio() == null || reserva.getFechaFin() == null
+                || !reserva.getFechaFin().isAfter(reserva.getFechaInicio())) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("La fechaFin debe ser posterior a la fechaInicio")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         }
 
         long dias = ChronoUnit.DAYS.between(reserva.getFechaInicio(), reserva.getFechaFin());
         dias = (dias <= 0) ? 1 : dias;
 
-        
         reserva.setUsuario(usuario);
         reserva.setVendedor(vendedor);
         reserva.setVehiculo(vehiculo);
         reserva.setFechaReserva(reserva.getFechaReserva() == null ? LocalDate.now() : reserva.getFechaReserva());
-        reserva.setEstado("CONFIRMADA");
+        reserva.setEstado(EstadoDisponibilidad.CONFIRMADA);
 
         this.rri.persist(reserva);
-        vehiculo.setEstadoDisponibilidad("RESERVADO");
+        vehiculo.setEstadoDisponibilidad(EstadoDisponibilidad.RESERVADO);
     }
 
     public List<ReservaVehiculo> buscarTodos() {
@@ -92,32 +131,84 @@ public class ReservaVehiculoService {
     }
 
     public void actualizarReservaVehiculo(ReservaVehiculo reserva, Integer id) {
-        if (reserva == null) throw new WebApplicationException("Datos vacíos", 400);
+        if (reserva == null)
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Los datos para actualizar no pueden estar vacíos")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
 
         ReservaVehiculo base = this.buscarReservaVehiculoId(id);
 
-        if (reserva.getFechaInicio() != null) base.setFechaInicio(reserva.getFechaInicio());
-        if (reserva.getFechaFin() != null) base.setFechaFin(reserva.getFechaFin());
-        if (reserva.getEstado() != null) base.setEstado(reserva.getEstado());
+        if (reserva.getFechaInicio() != null)
+            base.setFechaInicio(reserva.getFechaInicio());
+        if (reserva.getFechaFin() != null)
+            base.setFechaFin(reserva.getFechaFin());
+        if (reserva.getEstado() != null)
+            base.setEstado(reserva.getEstado());
 
         long dias = ChronoUnit.DAYS.between(base.getFechaInicio(), base.getFechaFin());
         dias = (dias <= 0) ? 1 : dias;
 
-
-        if ("CANCELADA".equalsIgnoreCase(base.getEstado()) || "FINALIZADA".equalsIgnoreCase(base.getEstado())) {
-            base.getVehiculo().setEstadoDisponibilidad("DISPONIBLE");
+        if (EstadoDisponibilidad.CANCELADA.equals(base.getEstado()) || EstadoDisponibilidad.FINALIZADA.equals(base.getEstado())) {
+            base.getVehiculo().setEstadoDisponibilidad(EstadoDisponibilidad.DISPONIBLE);
         }
     }
 
     public ReservaVehiculo buscarReservaVehiculoId(Integer id) {
         ReservaVehiculo reserva = this.rri.findById(id);
-        if (reserva == null) throw new WebApplicationException("Reserva no encontrada", 404);
+        if (reserva == null)
+            throw new WebApplicationException(
+                    Response.status(Response.Status.NOT_FOUND)
+                            .entity("Reserva no encontrada")
+                            .type(MediaType.TEXT_PLAIN)
+                            .build());
         return reserva;
     }
 
     public void eliminarReservaVehiculoId(Integer id) {
         ReservaVehiculo base = this.buscarReservaVehiculoId(id);
-        if (base.getVehiculo() != null) base.getVehiculo().setEstadoDisponibilidad("DISPONIBLE");
+        if (base.getVehiculo() != null)
+            base.getVehiculo().setEstadoDisponibilidad(EstadoDisponibilidad.DISPONIBLE);
         this.rri.deleteById(id);
+    }
+
+
+
+    //------------------------------
+    public ReservaVehiculo buscarPorPlaca(String placa) {
+        if (placa == null || placa.trim().isEmpty()) {
+            throw new WebApplicationException("La placa para la búsqueda no puede estar vacía", 400);
+        }
+
+        ReservaVehiculo reserva = this.rri.find("vehiculo.placa", placa.trim()).firstResult();
+        if (reserva == null) {
+            throw new WebApplicationException("No existen reservas registradas con la placa: " + placa, 404);
+        }
+        return reserva;
+    }
+    
+    public ReservaVehiculo buscarPorCedulaUsuario(String cedula) {
+        if (cedula == null || cedula.trim().isEmpty()) {
+            throw new WebApplicationException("La cédula del usuario para la búsqueda no puede estar vacía", 400);
+        }
+
+        ReservaVehiculo reserva = this.rri.find("usuario.cedula", cedula.trim()).firstResult();
+        if (reserva == null) {
+            throw new WebApplicationException("No existen reservas registradas con la cédula de usuario: " + cedula, 404);
+        }
+        return reserva;
+    }
+
+    public ReservaVehiculo buscarPorCedulaVendedor(String cedulaVendedor) {
+        if (cedulaVendedor == null || cedulaVendedor.trim().isEmpty()) {
+            throw new WebApplicationException("La cédula del vendedor para la búsqueda no puede estar vacía", 400);
+        }
+
+        ReservaVehiculo reserva = this.rri.find("vendedor.cedulaVendedor", cedulaVendedor.trim()).firstResult();
+        if (reserva == null) {
+            throw new WebApplicationException("No existen reservas registradas con la cédula de vendedor: " + cedulaVendedor, 404);
+        }
+        return reserva;
     }
 }
