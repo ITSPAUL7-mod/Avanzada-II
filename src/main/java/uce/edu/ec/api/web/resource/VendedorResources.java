@@ -45,6 +45,14 @@ public class VendedorResources {
         return vendedor;
     }
 
+    // http://localhost:8080/vendedores/guardarlist
+    @Path("/guardarlist")
+    @POST
+    public List<Vendedor> crearMuchos(List<Vendedor> vendedores) {
+        vs.crearVendedores(vendedores);
+        return vendedores;
+    }
+
     // http://localhost:8080/vendedores/actualizar/{cedula}
     @Path("/actualizar/{cedula}")
     @PUT

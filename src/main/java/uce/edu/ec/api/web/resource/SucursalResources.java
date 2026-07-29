@@ -40,6 +40,14 @@ public class SucursalResources {
         return sucursal;
     }
 
+    // http://localhost:8080/sucursales/guardarlist
+    @Path("/guardarlist")
+    @POST
+    public List<Sucursal> crearMuchos(List<Sucursal> sucursales) {
+        ss.crearSucursales(sucursales);
+        return sucursales;
+    }
+
     // http://localhost:8080/sucursales/actualizar/{id}
     @Path("/actualizar/{id}")
     @PUT
@@ -56,9 +64,9 @@ public class SucursalResources {
         return "Sucursal eliminada correctamente";
     }
 
-    // http://localhost:8080/sucursales/porId
+    // http://localhost:8080/sucursales/porId/
     @GET
-    @Path("/porId")
+    @Path("/porId/")
     public Sucursal buscarSinId() {
         return this.ss.buscarSucursalId(null);
     }

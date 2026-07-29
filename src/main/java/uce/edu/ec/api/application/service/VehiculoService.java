@@ -79,6 +79,18 @@ public class VehiculoService {
 
         this.vri.persist(vehiculo);
     }
+    
+    @Transactional
+    public void crearVehiculos(List<Vehiculo> vehiculos) {
+
+        if (vehiculos == null || vehiculos.isEmpty()) {
+            throw new WebApplicationException("La lista de vehiculos no puede estar vacía", 400);
+        }
+
+        for (Vehiculo vehiculo : vehiculos) {
+            crearVehiculo(vehiculo);
+        }
+    }
 
     public List<Vehiculo> buscarTodos() {
         return this.vri.findAll().list();
@@ -190,7 +202,6 @@ public class VehiculoService {
         return vehiculo;
     }
 
-    // ------------------------------------------
     public List<Vehiculo> buscarMarcayModelo(String marca, String modelo) {
 
         if (marca == null || marca.trim().isEmpty()) {

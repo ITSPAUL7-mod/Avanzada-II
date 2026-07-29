@@ -82,7 +82,8 @@ public class ReservaVehiculoService {
         if (vendedor == null) {
             throw new WebApplicationException(
                     Response.status(Response.Status.NOT_FOUND)
-                            .entity("No existe un vendedor registrado con la cédula " + reserva.getVendedor().getCedulaVendedor())
+                            .entity("No existe un vendedor registrado con la cédula "
+                                    + reserva.getVendedor().getCedulaVendedor())
                             .type(MediaType.TEXT_PLAIN)
                             .build());
         }
@@ -126,32 +127,61 @@ public class ReservaVehiculoService {
         vehiculo.setEstadoDisponibilidad(EstadoDisponibilidad.RESERVADO);
     }
 
+    public void crearReservasVehiculo(List<ReservaVehiculo> reservas) {
+
+        if (reservas == null || reservas.isEmpty()) {
+            throw new WebApplicationException("La lista de reservas no puede estar vacía", 400);
+        }
+
+        for (ReservaVehiculo reserva : reservas) {
+            crearReservaVehiculo(reserva);
+        }
+    }
+
     public List<ReservaVehiculo> buscarTodos() {
         return this.rri.findAll().list();
     }
 
     public void actualizarReservaVehiculo(ReservaVehiculo reserva, Integer id) {
-        if (reserva == null)
-            throw new WebApplicationException(
-                    Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Los datos para actualizar no pueden estar vacíos")
-                            .type(MediaType.TEXT_PLAIN)
-                            .build());
-
+        if (reserva == null) {
+            throw new IllegalArgumentException("Los datos para actualizar no pueden estar vacíos");
+        }
         ReservaVehiculo base = this.buscarReservaVehiculoId(id);
 
-        if (reserva.getFechaInicio() != null)
+        if (base == null) {
+            throw new IllegalArgumentException("No se encontró la reserva con ID: " + id);
+        }
+        if (reserva.getFechaInicio() != null) {
             base.setFechaInicio(reserva.getFechaInicio());
-        if (reserva.getFechaFin() != null)
+        }
+        if (reserva.getFechaFin() != null) {
             base.setFechaFin(reserva.getFechaFin());
-        if (reserva.getEstado() != null)
+        }
+        if (reserva.getEstado() != null) {
             base.setEstado(reserva.getEstado());
-
-        long dias = ChronoUnit.DAYS.between(base.getFechaInicio(), base.getFechaFin());
-        dias = (dias <= 0) ? 1 : dias;
-
-        if (EstadoDisponibilidad.CANCELADA.equals(base.getEstado()) || EstadoDisponibilidad.FINALIZADA.equals(base.getEstado())) {
-            base.getVehiculo().setEstadoDisponibilidad(EstadoDisponibilidad.DISPONIBLE);
+        }
+        if (reserva.getTotal() != null) {
+            base.setTotal(reserva.getTotal());
+        }
+        if (reserva.getVehiculo() != null && base.getVehiculo() != null) {
+            if (reserva.getVehiculo().getMarca() != null) {
+                base.getVehiculo().setMarca(reserva.getVehiculo().getMarca());
+            }
+            if (reserva.getVehiculo().getAnio() != null) {
+                base.getVehiculo().setAnio(reserva.getVehiculo().getAnio());
+            }
+            if (reserva.getVehiculo().getModelo() != null) {
+                base.getVehiculo().setModelo(reserva.getVehiculo().getModelo());
+            }
+            if (reserva.getVehiculo().getEstadoDisponibilidad() != null) {
+                base.getVehiculo().setEstadoDisponibilidad(reserva.getVehiculo().getEstadoDisponibilidad());
+            }
+        }
+        if (base.getVehiculo() != null) {
+            if (EstadoDisponibilidad.CANCELADA.equals(base.getEstado())
+                    || EstadoDisponibilidad.FINALIZADA.equals(base.getEstado())) {
+                base.getVehiculo().setEstadoDisponibilidad(EstadoDisponibilidad.DISPONIBLE);
+            }
         }
     }
 
@@ -173,9 +203,6 @@ public class ReservaVehiculoService {
         this.rri.deleteById(id);
     }
 
-
-
-    //------------------------------
     public ReservaVehiculo buscarPorPlaca(String placa) {
         if (placa == null || placa.trim().isEmpty()) {
             throw new WebApplicationException("La placa para la búsqueda no puede estar vacía", 400);
@@ -187,7 +214,7 @@ public class ReservaVehiculoService {
         }
         return reserva;
     }
-    
+
     public ReservaVehiculo buscarPorCedulaUsuario(String cedula) {
         if (cedula == null || cedula.trim().isEmpty()) {
             throw new WebApplicationException("La cédula del usuario para la búsqueda no puede estar vacía", 400);
@@ -195,7 +222,8 @@ public class ReservaVehiculoService {
 
         ReservaVehiculo reserva = this.rri.find("usuario.cedula", cedula.trim()).firstResult();
         if (reserva == null) {
-            throw new WebApplicationException("No existen reservas registradas con la cédula de usuario: " + cedula, 404);
+            throw new WebApplicationException("No existen reservas registradas con la cédula de usuario: " + cedula,
+                    404);
         }
         return reserva;
     }
@@ -207,7 +235,8 @@ public class ReservaVehiculoService {
 
         ReservaVehiculo reserva = this.rri.find("vendedor.cedulaVendedor", cedulaVendedor.trim()).firstResult();
         if (reserva == null) {
-            throw new WebApplicationException("No existen reservas registradas con la cédula de vendedor: " + cedulaVendedor, 404);
+            throw new WebApplicationException(
+                    "No existen reservas registradas con la cédula de vendedor: " + cedulaVendedor, 404);
         }
         return reserva;
     }

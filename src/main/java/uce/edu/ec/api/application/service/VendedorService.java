@@ -66,6 +66,17 @@ public class VendedorService {
         this.vri.persist(vendedor);
     }
 
+    public void crearVendedores(List<Vendedor> vendedores) {
+
+        if (vendedores == null || vendedores.isEmpty()) {
+            throw new WebApplicationException("La lista de vendedores no puede estar vacía", 400);
+        }
+
+        for (Vendedor vendedor : vendedores) {
+            crearVendedor(vendedor);
+        }
+    }
+
     public List<Vendedor> buscarTodos() {
         return this.vri.findAll().list();
     }
@@ -107,10 +118,9 @@ public class VendedorService {
 
    
 
-//-----------------------------------------------
     public void eliminarPorCedula(String cedula) {
         this.buscarPorCedula(cedula);
-        this.vri.delete("cedula", cedula); 
+        this.vri.delete("cedulaVendedor", cedula); 
     }
 
     public Vendedor buscarPorCedula(String cedula) {

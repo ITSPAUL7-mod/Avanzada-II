@@ -57,6 +57,18 @@ public class SucursalService {
         this.sri.persist(sucursal);
     }
 
+    @Transactional
+    public void crearSucursales(List<Sucursal> sucursales) {
+
+        if (sucursales == null || sucursales.isEmpty()) {
+            throw new WebApplicationException("La lista de sucursales no puede estar vacía", 400);
+        }
+
+        for (Sucursal sucursal : sucursales) {
+            crearSucursal(sucursal);
+        }
+    }
+
     public List<Sucursal> buscarTodos() {
         return this.sri.findAll().list();
     }

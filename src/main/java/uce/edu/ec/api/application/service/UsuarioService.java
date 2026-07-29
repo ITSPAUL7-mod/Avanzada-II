@@ -20,7 +20,7 @@ public class UsuarioService {
     @Inject
     private UsuarioRepositoryImpl uri;
 
-   public void crearUsuario(Usuario usuario) {
+    public void crearUsuario(Usuario usuario) {
 
         if (usuario == null) {
             throw new WebApplicationException(
@@ -64,6 +64,18 @@ public class UsuarioService {
         }
 
         this.uri.persist(usuario);
+    }
+
+    @Transactional
+    public void crearUsuarios(List<Usuario> usuarios) {
+
+        if (usuarios == null || usuarios.isEmpty()) {
+            throw new WebApplicationException("La lista de usuarios no puede estar vacía", 400);
+        }
+
+        for (Usuario usuario : usuarios) {
+            crearUsuario(usuario);
+        }
     }
 
     public List<Usuario> buscarTodos() {

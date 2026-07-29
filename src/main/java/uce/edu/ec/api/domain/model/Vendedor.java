@@ -20,7 +20,7 @@ public class Vendedor extends PanacheEntityBase {
     @Column(name = "ven_telefono")
     private String telefono;
 
-       public String getCedulaVendedor() {
+    public String getCedulaVendedor() {
         return cedulaVendedor;
     }
 

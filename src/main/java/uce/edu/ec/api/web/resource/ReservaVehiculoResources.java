@@ -41,6 +41,15 @@ public class ReservaVehiculoResources {
         return reserva;
     }
 
+    // http://localhost:8080/reservas/guardarlist
+    @POST
+    @Path("/guardarlist")
+    public List<ReservaVehiculo> crearMuchos(List<ReservaVehiculo> reservas) {
+        rs.crearReservasVehiculo(reservas);
+        return reservas;
+    }
+    
+
     // http://localhost:8080/reservas/actualizar/{id}
     @Path("/actualizar/{id}")
     @PUT

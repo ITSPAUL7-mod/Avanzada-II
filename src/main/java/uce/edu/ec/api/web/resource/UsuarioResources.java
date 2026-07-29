@@ -40,6 +40,15 @@ public class UsuarioResources {
         return usuario;
     }
 
+
+    // http://localhost:8080/usuarios/guardarlist
+    @Path("/guardarlist")
+    @POST
+    public List<Usuario> crearMuchos(List<Usuario> usuarios) {
+        us.crearUsuarios(usuarios);
+        return usuarios;
+    }
+
     // http://localhost:8080/usuarios/actualizar/{cedula}
     @Path("/actualizar/{cedula}")
     @PUT

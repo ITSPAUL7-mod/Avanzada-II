@@ -11,6 +11,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import uce.edu.ec.api.application.service.VehiculoService;
 import uce.edu.ec.api.domain.model.Vehiculo;
+import uce.edu.ec.api.domain.model.Vendedor;
 
 @Path("/vehiculos")
 public class VehiculoResources {
@@ -45,6 +46,13 @@ public class VehiculoResources {
     public Vehiculo guardar(Vehiculo vehiculo) {
         this.vs.crearVehiculo(vehiculo);
         return vehiculo;
+    }
+    // http://localhost:8080/vehiculos/guardarlist
+    @Path("/guardarlist")
+    @POST
+    public List<Vehiculo> crearMuchos(List<Vehiculo> vehiculos) {
+        this.vs.crearVehiculos(vehiculos);
+        return vehiculos;
     }
 
     // http://localhost:8080/vehiculos/actualizar/{id}
