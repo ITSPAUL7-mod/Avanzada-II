@@ -50,7 +50,7 @@ uce.edu.ec
  └── web.resource                -> XxxxResources con los endpoints JAX-RS
 ```
 
-No se usan clases DTO: los endpoints reciben y devuelven directamente las entidades. Para las entidades con relaciones (`Vehiculo`, `ReservaVehiculo`, `Factura`) el JSON de entrada envía el objeto relacionado anidado, indicando solo el dato necesario para ubicarlo (`id`, `cedula`, `cedulaVendedor` o `placa`); el servicio se encarga de buscar la entidad real en la base de datos antes de guardar.
+Los endpoints reciben y devuelven directamente las entidades. Para las entidades con relaciones (`Vehiculo`, `ReservaVehiculo`, `Factura`) el JSON de entrada envía el objeto relacionado anidado, indicando solo el dato necesario para ubicarlo (`id`, `cedula`, `cedulaVendedor` o `placa`); el servicio se encarga de buscar la entidad real en la base de datos antes de guardar.
 
 ## 5. Endpoints disponibles
 
@@ -105,44 +105,37 @@ Crea los recursos en este orden exacto para no violar restricciones de clave for
 }
 ```
 
-### 6.4 POST `http://localhost:8080/categorias-vehiculo/guardar`
+### 6.4 POST `http://localhost:8080/vehiculos/guardar`
 ```json
 {
-  "nombre": "SUV",
-  "precioPorDia": 45.00
-}
-```
-
-### 6.5 POST `http://localhost:8080/vehiculos/guardar`
-Envía el `id` de la categoría (paso 6.4) y de la sucursal (paso 6.3) dentro del objeto anidado.
-```json
-{
-  "placa": "PBX-1234",
-  "marca": "Toyota",
-  "modelo": "RAV4",
-  "anio": 2023,
+  "placa": "PBA-1023",
+  "marca": "Chevrolet",
+  "modelo": "Chevrolet Grand Vitara",
+  "anio": 2005,
   "estadoDisponibilidad": "DISPONIBLE",
-  "categoriaVehiculo": { "id": 1 },
-  "sucursal": { "id": 1 }
+  "sucursal": { 
+    "id": 1 
+  }
 }
 ```
-
-### 6.6 POST `http://localhost:8080/reservas/guardar`
-El servicio busca cada relación por su campo único (`cedula`, `cedulaVendedor`, `placa`), valida que el vehículo exista y esté `DISPONIBLE`, calcula el `total` según los días y el precio de la categoría, y lo cambia a `RESERVADO`.
+### 6.5 POST `http://localhost:8080/reservas/guardar`
+El servicio busca cada relación por su campo único (`cedula`, `cedulaVendedor`, `placa`), valida que el vehículo exista y esté `DISPONIBLE`, calcula el `total` del precio, y lo cambia a `RESERVADO`.
 ```json
 {
-  "fechaReserva": "2026-07-19",
-  "fechaInicio": "2026-07-20",
-  "fechaFin": "2026-07-25",
-  "usuario": { "cedula": "1712345678" },
-  "vendedor": { "cedulaVendedor": "1798765432" },
-  "vehiculo": { "placa": "PBX-1234" }
+  "fechaReserva": "2026-07-28",
+  "fechaInicio": "2026-08-01",
+  "fechaFin": "2026-08-05",
+  "estado": "CONFIRMADA",
+  "total": 1500,
+  "usuario": { 
+    "cedula": "1712345678" 
+  },
+  "vendedor": { 
+    "cedulaVendedor": "1790000001" 
+  },
+  "vehiculo": { 
+    "id": 1,
+    "placa": "PBA-1023"
+  }
 }
 ```
-
-## 7. Validaciones de negocio implementadas
-
-- `VehiculoService.crearVehiculo` valida que la categoría y la sucursal indicadas existan (`404` si no).
-- `ReservaVehiculoService.crearReservaVehiculo` valida, en este orden: existencia del usuario por `cedula`, existencia del vendedor por `cedulaVendedor`, existencia del vehículo por `placa`, y que su `estadoDisponibilidad` sea `DISPONIBLE`. Si alguna entidad no existe responde `404`; si el vehículo no está disponible o las fechas son inválidas responde `400`.
-- Al crear una reserva, el vehículo pasa automáticamente a `RESERVADO`; al eliminarla o marcarla como `CANCELADA`/`FINALIZADA` vuelve a `DISPONIBLE`.
-- `FacturaService.crearFactura` valida que la reserva exista y que no tenga ya una factura asociada (relación `@OneToOne`).
