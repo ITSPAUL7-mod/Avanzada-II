@@ -7,6 +7,6 @@ import uce.edu.ec.api.domain.model.Usuario;
 
 @ApplicationScoped
 @Transactional
-public class UsuarioRepositoryImpl implements PanacheRepositoryBase<Usuario, Integer> {
+public class UsuarioRepositoryImpl implements PanacheRepositoryBase<Usuario, String> {
 
 }
