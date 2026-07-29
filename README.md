@@ -69,10 +69,10 @@ Recursos:
 - `/usuarios`
 - `/vendedores`
 - `/sucursales`
-- `/categorias-vehiculo`
 - `/vehiculos` (además `GET /vehiculos/porPlaca/{placa}`)
 - `/reservas`
-- `/facturas`
+- `/auditoria`
+- `/estado-disponibilidad`
 
 ## 6. Orden de creación en Postman (respeta las FK)
 
@@ -137,17 +137,6 @@ El servicio busca cada relación por su campo único (`cedula`, `cedulaVendedor`
   "usuario": { "cedula": "1712345678" },
   "vendedor": { "cedulaVendedor": "1798765432" },
   "vehiculo": { "placa": "PBX-1234" }
-}
-```
-
-### 6.7 POST `http://localhost:8080/facturas/guardar`
-Envía el `id` de la reserva creada en el paso 6.6.
-```json
-{
-  "numeroFactura": "FAC-000001",
-  "fechaEmision": "2026-07-19",
-  "metodoPago": "TARJETA_CREDITO",
-  "reservaVehiculo": { "id": 1 }
 }
 ```
 
